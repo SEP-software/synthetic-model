@@ -1,7 +1,7 @@
 [project]
 
 name='synthetic_model'
-version='0.1.1'
+version='0.1.2'
 description='A library for creating synthetic model'
 
 authors=[
@@ -13,7 +13,7 @@ maintainesr=[
 ]
 dependencies=[ 'holoviews>=1.14.1', 'scipy>=1.6.2','opensimplex>=0.4.2',
 'h5py==2.10.0', 'selenium==4.3.0','holoviews==1.14.6',
-      'sep_python @ git+https://github.com/SEP-software/sep-python.git@486a116f1a68d5a555fd336fc873b1c79d145aa1'
+      'sep_python @ git+https://github.com/SEP-software/sep-python.git@09c4f22ef1e01f7cad007a94921338dea660db7a'
             ]
 
 
