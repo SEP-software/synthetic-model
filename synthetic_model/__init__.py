@@ -13,3 +13,4 @@ from synthetic_model._salt import Basic as Salt
 from synthetic_model._squish import Basic as Squish
 from synthetic_model._data import *
 from synthetic_model._simplex_noise import SimplexNoise
+from sep_python import (Hypercube, Axis)

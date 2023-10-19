@@ -11,6 +11,23 @@ import numpy as np
 from numba import prange
 
 
+
+@numba.njit(parallel=True)
+# "void(int32[:,:,:],int64[:,:],List(float64),boolean[:],float64,float64,float32[:,:],float32[:,:],float32[:,:],int32[:,:,:])",parallel=True)
+def cleanUpLayer(field,ilocs):
+    for ipos in numba.prange(field.shape[0]):
+        i2 = ilocs[1, ipos]
+        i3 = ilocs[0, ipos]
+        found=False
+        i1=20
+        while i1 >=0 and not found:
+            if field[i3,i2,i1]==-1:
+                found=True
+                field[i3,i2,0:i1]=-1
+            i1-=1
+
+      
+
 @numba.njit(parallel=True)
 # "void(int32[:,:,:],int64[:,:],List(float64),boolean[:],float64,float64,float32[:,:],float32[:,:],float32[:,:],int32[:,:,:])",parallel=True)
 def shiftIntField(
@@ -179,9 +196,11 @@ def shiftFloatField(
                     l1 = i1 - shift1[ipos, i1] / ds[0]
                     l2 = i2 - shift2[ipos, i1] / ds[1]
                     l3 = i3 - shift3[ipos, i1] / ds[2]
-                    if l1 < 0:
+
+                    if l1 < -.49:
                         fieldOut[i3, i2, i1] = fill
-                    elif l1 >= fieldIn.shape[2]:
+  
+                    elif l1 >= fieldIn.shape[2]-.49999:
                         fieldOut[i3, i2, i1] = basement
                     else:
                         il1 = int(l1)
@@ -239,12 +258,12 @@ def shiftFloatField(
                                         * syncT[is1, ia]
                                     )
                                     sm += v
+
                         fieldOut[i3, i2, i1] = sm
                 else:
                     fieldOut[i3, i2, i1] = fieldIn[i3, i2, i1]
         else:
             fieldOut[i3, i2, :] = fieldIn[i3, i2, :]
-
 
 class Fault(Event):
     """Default class for faulting"""
@@ -563,6 +582,7 @@ class Fault(Event):
                 sincT,
                 outF,
             )
+        cleanUpLayer(outM.getIntField("layer").get_nd_array(),indexes)
         if indicateI:
             j = outM.getIntField("indicator").get_nd_array()
             j += tmpI

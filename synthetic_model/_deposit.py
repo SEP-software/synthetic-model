@@ -29,13 +29,18 @@ def calc1DDeposition(n1: int, thickness):
     layers = np.zeros((n1,), dtype=np.float32)
     curThick = 0
     ilayer = 0
+    last=False
     for i in range(n1):
         curThick += 1
         if thickness[ilayer] < curThick:
             layers[ilayer] = i
             ilayer += 1
             curThick = 0
-    ilayer += 1
+            last=True
+        else:
+            last=False
+    if not last:
+        ilayer += 1
     return layers, ilayer
 
 
@@ -154,14 +159,14 @@ def createPropArray(nlayer, grad, noise3D, layer1D, val1D, noiseV, izOff):
 
     """
     outA = noise3D.copy()
-
     for i3 in numba.prange(outA.shape[0]):
         for i2 in range(outA.shape[1]):
             ilast = 0
-            for i1 in range(nlayer):
+            for i1 in range(nlayer-1):
                 inext = max(
                     0, min(outA.shape[2], int(0.5 + noise3D[i3, i2, i1] + layer1D[i1]))
                 )
+                
                 for i in range(ilast, inext):
                     outA[i3, i2, i] = (
                         val1D[i1] + grad * i + noiseV[i3, i2, i + izOff[i1]]
@@ -171,7 +176,6 @@ def createPropArray(nlayer, grad, noise3D, layer1D, val1D, noiseV, izOff):
                 outA[i3, i2, i] = (
                     val1D[nlayer - 1] + grad * i + noiseV[i3, i2, i + izOff[nlayer - 1]]
                 )
-
     return outA
 
 

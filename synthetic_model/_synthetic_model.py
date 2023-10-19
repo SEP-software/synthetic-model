@@ -7,8 +7,8 @@ import numpy as np
 from datetime import datetime
 import copy
 from scipy.signal import butter, lfilter
-from sep_python.hypercube import Hypercube, Axis
-from sep_python.sep_vector import get_sep_vector
+from sep_python import Hypercube, Axis
+from sep_python import get_sep_vector
 
 usingSepVector = False
 

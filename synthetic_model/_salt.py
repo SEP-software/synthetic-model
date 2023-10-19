@@ -18,7 +18,7 @@ import datetime
 import scipy
 
 RAND_INT_LIMIT = 100000
-AMPLITUDE_LEVELS = [1, 0.5, 0.125, 0.0625]
+AMPLITUDE_LEVELS = [1, 0.5, 0.125, 0.0625,.03125,.015625,.0783125,.03915625]
 
 
 @njit(parallel=True)
@@ -86,7 +86,8 @@ def create_3d(
     end2=1.0,
     end3=1.0,
     dieF=0.01,
-    baseFreq=3.0,
+    baseFreqTop=3.0,
+    baseFreqBot=3.0,
     mirror_top=False,
 ):
     """create a 3d model with a salt body
@@ -131,7 +132,7 @@ def create_3d(
 
     # find top salt noise field
     top = find_2d_noise_field(
-        n1, n2, d=1.0, noise_levels=n_octaves_top, baseFreq=baseFreq
+        n1, n2, d=1.0, noise_levels=n_octaves_top, baseFreq=baseFreqTop
     )
 
     # convert noise field values to depth indices
@@ -143,7 +144,7 @@ def create_3d(
     # find bottom salt noise field
     if mirror_top:
         np.random.seed(seed=seed)
-    bot = find_2d_noise_field(n1, n2, d, noise_levels=n_octaves_bot, baseFreq=baseFreq)
+    bot = find_2d_noise_field(n1, n2, d, noise_levels=n_octaves_bot, baseFreq=baseFreqBot)
 
     # convert noise field values to depth indices
     bot = (bot - np.mean(bot)) / np.amax(np.abs(bot)) * amplitude_bot
@@ -182,8 +183,8 @@ def find_2d_noise_field(n1, n2, d=1.0, baseFreq=3.0, noise_levels=4, normalize=T
     p = np.reshape(p, (-1, 2)).T
 
     FREQUENCY_LEVELS = [baseFreq]
-    for i in range(3):
-        FREQUENCY_LEVELS.append(FREQUENCY_LEVELS[-1])
+    for i in range(noise_levels):
+        FREQUENCY_LEVELS.append(FREQUENCY_LEVELS[-1]*2.)
 
     # get freq and amplitude values for perlin octaves
     freq_levels = list(np.array(FREQUENCY_LEVELS[:noise_levels]) / (n1 * d))
@@ -291,7 +292,8 @@ class Salt(Event):
         amplitude_top: float = 0.66,
         amplitude_bot: float = 0.66,
         mid_salt_depth: float = 0.4,
-        beg_freq: float = 3.0,
+        beg_freq_top: float = 3.0,
+        beg_freq_bot: float = 3.0,
         beg2: float = 0.0,
         beg3: float = 0.0,
         end2: float = 1.0,
@@ -319,7 +321,8 @@ class Salt(Event):
           salt. Defaults to 3.
         beg2,beg3,end2,end3  [0,0,1.,1.] Limit for salt
         dieF  [.05] Salt die off fraction
-        beg_freq [3.] Initial frequncy for noise
+        beg_freq_top [3.] Initial frequncy for noise
+        beg_freq_bot [3.] Initial frequncy for noise
         amplitude_top (float, optional): Scaling to apply to top salt amplitudes.
           Reasonable values range from [0,1]. Defaults to 0.66.
         amplitude_bot (float, optional): Scaling to apply to bottom salt
@@ -357,7 +360,9 @@ class Salt(Event):
                 dieF=dieF,
                 mid_salt_depth=mid_salt_depth,
                 mirror_top=mirror_top,
-                baseFreq=beg_freq,
+                baseFreqTop=beg_freq_top,
+                baseFreqBot=beg_freq_bot
+
             )
 
             if applyHills:
@@ -373,6 +378,7 @@ class Salt(Event):
             if indicateI:
                 indicateInt = outM.getCreateIntField("indicator", 0, 0).get_nd_array()
                 fillModel(slt, indicateInt.get_nd_array(), indicateMark)
+
 
             for fld in outM.getFloatFieldList():
                 if applyHills:

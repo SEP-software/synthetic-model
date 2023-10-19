@@ -65,7 +65,6 @@ def fractal(p,
   """
   frequencies = get_frequencies(frequency, lucanarity, n_octaves)
   amplitudes = get_amplitudes(amplitude, persistence, n_octaves)
-
   noise = np.zeros(p.shape[-1])
 
   for i_octave in range(n_octaves):
