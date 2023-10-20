@@ -333,7 +333,6 @@ class Deposit(Event):
           'p1' to specify the deviation you would use 'p1_dev'.
 
 
-
         _noiseFreq - [2.] Higher frequency means more faster change
         _noiseLacunarity [2.] How multiple octaves increase in frequency
         _noisePeristence [.5] How multiple octaves max value changes
@@ -422,6 +421,7 @@ class Deposit(Event):
             persistence=noisePersistence,
             n_octaves=noiseOctaves,
             amplitude=noiseDev,
+            
         )
         ievent = outM.getNewEvent()
 
@@ -434,6 +434,7 @@ class Deposit(Event):
         baseValues = createPropArray(
             nlayer, depthGrad / axes[0].d, noise3D, layer1D, val1D, noiseV, sendList
         )
+
         mainProp = inM.getPrimary()
         sinc = table
         for fld in outM.getFloatFieldList():

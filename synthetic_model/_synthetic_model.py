@@ -306,7 +306,17 @@ class GeoModel:
 
         # write to disk
         return out_sepVec
+    
+    def writeNPZ(self,file):
+        dict_out={}
+        for fld in self.getFloatFieldList():
+            dict_out[fld]=self.getFloatField(fld).get_nd_array()
+        for fld in self.getIntFieldList():
+            dict_out[fld]=self.getIntField(fld).get_nd_array()
+        np.savez(file,**dict_out) 
 
+    
+    
     def writeModel(self, filename, min_clip={}, max_clip={}):
         """write the model to disk. slow axis is 'properties' and fast axis is
           depth,z
