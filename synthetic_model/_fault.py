@@ -15,11 +15,12 @@ from numba import prange
 @numba.njit(parallel=True)
 # "void(int32[:,:,:],int64[:,:],List(float64),boolean[:],float64,float64,float32[:,:],float32[:,:],float32[:,:],int32[:,:,:])",parallel=True)
 def cleanUpLayer(field,ilocs):
-    for ipos in numba.prange(field.shape[0]):
+    for ipos in numba.prange(ilocs.shape[1]):
         i2 = ilocs[1, ipos]
         i3 = ilocs[0, ipos]
         found=False
         i1=20
+
         while i1 >=0 and not found:
             if field[i3,i2,i1]==-1:
                 found=True
@@ -38,7 +39,8 @@ def shiftIntField(
         i3 = ilocs[0, ipos]
         if changed[ipos]:
             for i1 in range(fieldIn.shape[2]):
-                l1 = int(i1 - shift1[ipos, i1] / ds[0] + 0.5)
+                
+                l1 = round(i1 - shift1[ipos, i1] / ds[0])
                 l2 = max(
                     0,
                     min(fieldIn.shape[1] - 1, int(i2 - shift2[ipos, i1] / ds[1] + 0.5)),
@@ -47,6 +49,7 @@ def shiftIntField(
                     0,
                     min(fieldIn.shape[2] - 1, int(i3 - shift3[ipos, i1] / ds[2] + 0.5)),
                 )
+
                 if l1 < 0:
                     fieldOut[i3, i2, i1] = fill
                 elif l1 >= fieldIn.shape[2]:
@@ -197,7 +200,7 @@ def shiftFloatField(
                     l2 = i2 - shift2[ipos, i1] / ds[1]
                     l3 = i3 - shift3[ipos, i1] / ds[2]
 
-                    if l1 < -.49:
+                    if l1 < -.4999999:
                         fieldOut[i3, i2, i1] = fill
   
                     elif l1 >= fieldIn.shape[2]-.49999:
@@ -260,11 +263,12 @@ def shiftFloatField(
                                     sm += v
 
                         fieldOut[i3, i2, i1] = sm
+
                 else:
                     fieldOut[i3, i2, i1] = fieldIn[i3, i2, i1]
+
         else:
             fieldOut[i3, i2, :] = fieldIn[i3, i2, :]
-
 class Fault(Event):
     """Default class for faulting"""
 
