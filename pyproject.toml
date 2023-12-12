@@ -13,7 +13,7 @@ maintainesr=[
 ]
 dependencies=[ 'holoviews>=1.14.1', 'scipy>=1.6.2','opensimplex>=0.4.2',
 'selenium==4.3.0','holoviews==1.14.6',
-      'sep_python @ git+https://github.com/SEP-software/sep-python.git@3caa6ce3282ade458bc51cda284f00e4990b0e47'
+      'sep_python @ git+https://github.com/SEP-software/sep-python.git@c06ba273907f40afd209da775875e58c743035d9'
             ]
 
 
